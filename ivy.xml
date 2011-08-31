@@ -1,0 +1,87 @@
+<!--
+  Copyright 2011 Couchbase, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+ -->
+
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+  <info organisation="Couchbase" module="${name}"/>
+  <configurations defaultconfmapping="default">
+    <!--these match the Maven configurations-->
+    <conf name="default" extends="master,runtime"/>
+    <conf name="master" description="Contains artifacts but no dependencies"/>
+    <conf name="runtime" description="runtime but not the artifact" />
+
+    <conf name="checkstyle" visibility="private" />
+
+    <conf name="common" visibility="private" extends="runtime"
+        description="artifacts needed to compile/test the application"/>
+  </configurations>
+
+  <dependencies>
+    <dependency org="com.cloudera.sqoop" name="sqoop" rev="${sqoop.version}"
+        conf="common->master">
+      <artifact name="sqoop" type="jar"/>
+      <artifact name="sqoop" type="test-jar" ext="jar" m:classifier="tests"/>
+    </dependency>
+
+    <dependency org="org.apache.hadoop" name="hadoop-core"
+        rev="${hadoop-core.cloudera.version}" conf="common->master"/>
+    <dependency org="org.apache.hadoop" name="hadoop-test"
+        rev="${hadoop-core.cloudera.version}" conf="common->master"/>
+
+    <dependency org="org.jboss.netty" name="netty"
+        rev="${netty.version}" conf="common->master"/>
+    <dependency org="commons-cli" name="commons-cli"
+        rev="${commons-cli.version}" conf="common->master"/>
+    <dependency org="commons-io" name="commons-io"
+        rev="${commons-io.version}" conf="common->master"/>
+    <dependency org="org.codehaus.jettison" name="jettison"
+        rev="${jettison.version}" conf="common->master"/>
+    <dependency org="org.codehaus.jackson" name="jackson-mapper-asl"
+        rev="${jackson.version}" conf="common->master"/>
+    <dependency org="org.codehaus.jackson" name="jackson-core-asl"
+        rev="${jackson.version}" conf="common->master"/>
+
+    <dependency org="commons-codec" name="commons-codec"
+        rev="${commons-codec.version}" conf="common->master"/>
+    <dependency org="commons-logging" name="commons-logging"
+        rev="${commons-logging.version}" conf="common->master"/>
+    <dependency org="junit" name="junit" rev="${junit.version}"
+        conf="common->master"/>
+    <dependency org="log4j" name="log4j" rev="${log4j.version}"
+        conf="common->master"/>
+    <dependency org="hsqldb" name="hsqldb" rev="${hsqldb.version}"
+        conf="common->master"/>
+    <dependency org="spy" name="spymemcached" rev="${spymemcached.version}"
+        conf="common->master"/>
+    <dependency org="commons-httpclient" name="commons-httpclient"
+        rev="${commons-httpclient.version}" conf="common->master"/>
+
+    <dependency org="org.apache.hbase" name="hbase" rev="${hbase.version}"
+        conf="common->master">
+      <artifact name="hbase" type="jar"/>
+      <artifact name="hbase" type="test-jar" ext="jar"/>
+      <exclude org="com.sun.jersey" module="jersey-core"/>
+      <exclude org="com.sun.jersey" module="jersey-json"/>
+      <exclude org="com.sun.jersey" module="jersey-server"/>
+      <exclude org="org.apache.thrift" module="thrift"/>
+      <exclude org="log4j" module="log4j"/>
+    </dependency>
+
+    <dependency org="checkstyle" name="checkstyle" rev="${checkstyle.version}"
+        conf="checkstyle->default" />
+  </dependencies>
+</ivy-module>

@@ -1,0 +1,283 @@
+<!--
+  Copyright 2011 Couchbase, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+ -->
+
+<project name="couchbase-hadoop-plugin" default="jar"
+    xmlns:artifact="urn:maven-artifact-ant"
+    xmlns:ivy="antlib:org.apache.ivy.ant">
+
+  <!-- Directory variables -->
+  <property name="name" value="couchbase-hadoop-plugin"/>
+  <property name="version" value="1.0"/>
+  <property name="lib.dir" value="${basedir}/lib" />
+  <property name="ivy.dir" location="${basedir}/ivy" />
+  <property name="build.dir" value="${basedir}/build" />
+  <property name="base.src.dir" value="${basedir}/src" />
+  <property name="src.dir" value="${basedir}/src/java" />
+  <property name="test.dir" value="${basedir}/src/test" />
+  <property name="perftest.dir" value="${basedir}/src/perftest" />
+  <property name="etc.dir" value="${basedir}/etc" />
+  <property name="dist.dir" value="${basedir}/couchsqoop-plugin" />
+  <property name="build.classes" location="${build.dir}/classes"/>
+  <property name="build.test.classes" location="${build.classes}/test"/>
+
+  <property name="sqoop.test.couchbase.connectstring"
+    value="http://localhost:8091/pools"/>
+
+  <property name="artifact.name" value="${name}-${version}" />
+  <property name="dest.jar" value="${artifact.name}.jar" />
+
+  <!--Maven naming policy-->
+  <property name="ivy.artifact.retrieve.pattern"
+      value="${name}/[conf]/[artifact]-[revision](-[classifier]).[ext]"/>
+
+  <!-- Ivy-based dependency resolution -->
+  <property name="ivysettings.xml" location="${ivy.dir}/ivysettings.xml"/>
+  <loadproperties srcfile="${ivy.dir}/libraries.properties"/>
+  <property name="ivy.jar" location="${lib.dir}/ivy-${ivy.version}.jar"/>
+  <property name="ivy_repo_url"
+      value="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar" />
+  <property name="mvn_repo_url"
+      value="http://repo2.maven.org/maven2/org/apache/maven/maven-ant-tasks/${mvn.version}/maven-ant-tasks-${mvn.version}.jar"/>
+  <property name="mvn.jar" location="${build.dir}/maven-ant-tasks-${mvn.version}.jar" />
+  <property name="build.ivy.dir" location="${build.dir}/ivy" />
+  <property name="build.ivy.lib.dir" location="${build.ivy.dir}/lib" />
+  <property name="build.ivy.report.dir" location="${build.ivy.dir}/report" />
+  <property name="redist.ivy.lib.dir" location="${build.ivy.lib.dir}/${name}/redist"/>
+
+  <!-- Checking code style -->
+  <property name="checkstyle.xml" value="${etc.dir}/checkstyle.xml" />
+  <property name="checkstyle.format.xsl" value="${etc.dir}/checkstyle-noframes.xsl" />
+  <property name="checkstyle.report.dir" value="${build.dir}/checkstyle" />
+
+  <!-- Compilation -->
+  <property name="javac.deprecation" value="off"/>
+  <property name="javac.debug" value="on"/>
+  <property name="build.encoding" value="ISO-8859-1"/>
+
+  <path id="compile.classpath">
+    <pathelement location="${build.classes}"/>
+    <path refid="${name}.common.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${build.test.classes}" />
+    <path refid="compile.classpath" />
+  </path>
+
+  <!-- ======================================
+        Section: Initializing
+       ====================================== -->
+  <target name="ivy-probe-antlib" >
+    <condition property="ivy.found">
+      <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
+    </condition>
+  </target>
+
+  <target name="ivy-download" unless="offline">
+    <mkdir dir="${lib.dir}" />
+    <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true"/>
+  </target>
+
+  <target name="ivy-init-antlib" depends="ivy-download,ivy-probe-antlib"
+    unless="ivy.found">
+    <typedef uri="antlib:org.apache.ivy.ant" onerror="fail"
+      loaderRef="ivyLoader">
+      <classpath>
+        <pathelement location="${ivy.jar}"/>
+      </classpath>
+    </typedef>
+    <fail >
+      <condition >
+        <not>
+          <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
+        </not>
+      </condition>
+        You need Apache Ivy 2.0 or later from http://ant.apache.org/
+        It could not be loaded from ${ivy_repo_url}
+    </fail>
+  </target>
+
+  <target name="ivy-init" depends="ivy-init-antlib" unless="ivy.configured">
+    <ivy:configure settingsid="${name}.ivy.settings" file="${ivysettings.xml}"/>
+    <property name="ivy.configured" value="true" />
+  </target>
+
+  <!-- =================================
+        Section: Dependency Resolution
+       ================================= -->
+  <target name="ivy-resolve" depends="ivy-init">
+    <ivy:resolve settingsRef="${name}.ivy.settings" conf="common" />
+  </target>
+
+  <target name="ivy-retrieve" depends="ivy-resolve">
+    <ivy:retrieve settingsRef="${name}.ivy.settings" conf="common"
+      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" sync="true" />
+    <ivy:cachepath pathid="${name}.common.classpath" conf="common" />
+  </target>
+
+  <!-- retrieve ivy-managed artifacts for checkstyle -->
+  <target name="ivy-resolve-checkstyle" depends="ivy-init">
+    <ivy:resolve settingsRef="${name}.ivy.settings" conf="checkstyle" />
+  </target>
+
+  <target name="ivy-retrieve-checkstyle" depends="ivy-resolve-checkstyle">
+    <ivy:retrieve settingsRef="${name}.ivy.settings"
+      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" sync="true" />
+    <ivy:cachepath pathid="${name}.checkstyle.classpath" conf="checkstyle" />
+  </target>
+
+  <!-- =================================
+        Section: Testing
+       ================================= -->
+  <target name="report" depends="ivy-retrieve" description="Generates a report of dependencies">
+      <ivy:report todir="${build.dir}"/>
+  </target>
+
+  <target name="test" depends="compile-test">
+    <junit fork="yes" haltonfailure="no">
+      <batchtest fork="yes">
+        <fileset dir="${test.dir}">
+          <include name="**/*Test.java" />
+        </fileset>
+      </batchtest>
+      <jvmarg value="-ea" />
+      <sysproperty key="hadoop.root.logger" value="DEBUG,console" />
+      <sysproperty key="sqoop.test.couchbase.connectstring"
+          value="${sqoop.test.couchbase.connectstring}"/>
+      <formatter type="plain" usefile="false" />
+      <classpath refid="test.classpath" />
+    </junit>
+  </target>
+
+    <!-- =================================
+          Section: Compiling
+         ================================= -->
+  <target name="compile" depends="ivy-init, ivy-retrieve" description="Compile and run the project">
+    <mkdir dir="${build.classes}" />
+    <javac
+        includeantruntime="false"
+        encoding="${build.encoding}"
+        srcdir="${src.dir}"
+        includes="**/*.java"
+        destdir="${build.classes}"
+        debug="${javac.debug}"
+        deprecation="${javac.deprecation}">
+      <classpath refid="${name}.common.classpath" />
+    </javac>
+  </target>
+
+  <target name="compile-test" depends="compile"
+      description="Compile test classes">
+    <mkdir dir="${build.test.classes}" />
+    <javac
+        includeantruntime="false"
+        encoding="${build.encoding}"
+        srcdir="${test.dir}"
+        includes="**/*.java"
+        destdir="${build.test.classes}"
+        debug="${javac.debug}">
+      <classpath>
+        <path refid="test.classpath"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <!-- ======================================
+        Section: Packaging
+       ====================================== -->
+
+  <target name="jar" depends="ivy-init, compile" description="Creates a jar file for the plugin">
+    <jar jarfile="${build.dir}/${dest.jar}" basedir="${build.classes}" />
+  </target>
+
+  <target name="package" depends="ivy-init, jar" description="Packages files for distribution">
+    <mkdir dir="${dist.dir}" />
+    <copy file="${etc.dir}/documentation.pdf" todir="${dist.dir}" />
+    <copy file="${etc.dir}/couchsqoop-config.xml" todir="${dist.dir}" />
+    <copy file="${etc.dir}/couchsqoop-manager" todir="${dist.dir}" />
+    <copy file="${build.ivy.lib.dir}/${name}/common/spymemcached-${spymemcached.version}.jar"
+        todir="${dist.dir}" />
+    <copy file="${build.ivy.lib.dir}/${name}/common/jettison-${jettison.version}.jar"
+        todir="${dist.dir}" />
+    <copy file="${build.ivy.lib.dir}/${name}/common/netty-${netty.version}.jar"
+        todir="${dist.dir}" />
+    <copy file="${etc.dir}/install.sh" todir="${dist.dir}" />
+    <copy file="${build.dir}/${name}-${version}.jar" todir="${dist.dir}" />
+    <zip destfile="${name}-${version}.zip" basedir="${dist.dir}" />
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <!-- ======================================
+        Section: Checkstyle Integration
+       ====================================== -->
+  <target name="checkstyle" depends="ivy-retrieve-checkstyle, compile"
+      description="Check source code conventions">
+    <taskdef resource="checkstyletask.properties">
+      <classpath refid="${name}.checkstyle.classpath" />
+    </taskdef>
+
+    <mkdir dir="${checkstyle.report.dir}" />
+    <checkstyle config="${checkstyle.xml}" failOnViolation="false">
+      <fileset dir="${base.src.dir}" includes="**/*.java" />
+      <classpath refid="test.classpath"/>
+      <formatter type="xml"
+        toFile="${checkstyle.report.dir}/checkstyle-errors.xml" />
+    </checkstyle>
+
+    <xslt style="${checkstyle.format.xsl}"
+      in="${checkstyle.report.dir}/checkstyle-errors.xml"
+      out="${checkstyle.report.dir}/checkstyle-errors.html" />
+  </target>
+
+  <!-- ======================================
+        Section: IDE Integration
+       ====================================== -->
+  <target name="eclipse" description="Generate Eclipse project"
+      depends="ivy-retrieve">
+    <taskdef name="eclipse" classname="prantl.ant.eclipse.EclipseTask"
+        classpath="${lib.dir}/ant-eclipse-1.0-jvm1.2.jar" />
+    <eclipse failonerror="true" updatealways="true">
+      <project name="${name}" />
+      <classpath>
+        <source path="${src.dir}" />
+        <source path="${test.dir}" />
+        <source path="${perftest.dir}" />
+        <output path="${build.dir}/eclipse-build" />
+        <library pathref="${name}.common.classpath" />
+      </classpath>
+    </eclipse>
+  </target>
+
+  <!-- =================================
+        Section: Cleaning
+       ================================= -->
+  <target name="clean" description="Clean the project">
+    <delete includeemptydirs="true">
+      <fileset dir="${basedir}">
+        <exclude name="src/**" />
+        <exclude name="ivy/**" />
+        <exclude name="etc/**" />
+        <exclude name="lib/ant-eclipse-1.0-jvm1.2.jar" />
+        <exclude name="build.xml" />
+        <exclude name="ivy.xml" />
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="clean-cache" description="Clean the ivy cache">
+    <ivy:cleancache />
+  </target>
+</project>
