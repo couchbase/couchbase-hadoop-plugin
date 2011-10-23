@@ -31,18 +31,18 @@ import org.apache.hadoop.mapreduce.InputSplit;
 public class CouchbaseInputSplit extends InputSplit implements Writable {
 
   // A location here is synonymous with a vbucket.
-  private int[] locations;
+  private short[] locations;
 
   public CouchbaseInputSplit() {
     // Empty
   }
 
-  public CouchbaseInputSplit(int[] locs) {
+  public CouchbaseInputSplit(short[] locs) {
     locations = locs;
   }
 
-  public CouchbaseInputSplit(List<Integer> locs) {
-    locations = new int[locs.size()];
+  public CouchbaseInputSplit(List<Short> locs) {
+    locations = new short[locs.size()];
 
     for (int i = 0; i < locs.size(); i++) {
       locations[i] = locs.get(i);
@@ -59,30 +59,30 @@ public class CouchbaseInputSplit extends InputSplit implements Writable {
     String[] sLocs = new String[locations.length];
 
     for (int i = 0; i < locations.length; i++) {
-      sLocs[i] = Integer.toString(locations[i]);
+      sLocs[i] = Short.toString(locations[i]);
     }
     return sLocs;
   }
 
-  public int[] getVBuckets() {
+  public short[] getVBuckets() {
     return locations;
   }
 
   @Override
   public void readFields(DataInput input) throws IOException {
 
-    int length = input.readInt();
-    locations = new int[length];
+    int length = input.readShort();
+    locations = new short[length];
     for (int i = 0; i < locations.length; i++) {
-      locations[i] = input.readInt();
+      locations[i] = input.readShort();
     }
   }
 
   @Override
   public void write(DataOutput output) throws IOException {
-    output.writeInt(locations.length);
+    output.writeShort(locations.length);
     for (int i = 0; i < locations.length; i++) {
-      output.writeInt(locations[i]);
+      output.writeShort(locations[i]);
     }
   }
 

@@ -98,10 +98,10 @@ public class CouchbaseInputFormat<T extends DBWritable> extends
     List<InputSplit> splits = new ArrayList<InputSplit>();
 
     int splitIndex = 0;
-    int[] curSplit = nextEmptySplit(itemsPerChunk, extraItems);
+    short[] curSplit = nextEmptySplit(itemsPerChunk, extraItems);
     extraItems--;
 
-    for (int i = 0; i < numVBuckets + 1; i++) {
+    for (short i = 0; i < numVBuckets + 1; i++) {
       if (splitIndex == curSplit.length) {
         CouchbaseInputSplit split = new CouchbaseInputSplit(curSplit);
         splits.add(split);
@@ -115,11 +115,11 @@ public class CouchbaseInputFormat<T extends DBWritable> extends
     return splits;
   }
 
-  private int[] nextEmptySplit(int itemsPerChunk, int extraItems) {
+  private short[] nextEmptySplit(int itemsPerChunk, int extraItems) {
     if (extraItems > 0) {
-      return new int[itemsPerChunk + 1];
+      return new short[itemsPerChunk + 1];
     } else {
-      return new int[itemsPerChunk];
+      return new short[itemsPerChunk];
     }
   }
 }

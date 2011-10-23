@@ -126,15 +126,14 @@ public class CouchbaseRecordReader<T extends DBWritable>
         builder.doDump();
         builder.supportAck();
         builder.specifyVbuckets(((CouchbaseInputSplit)split).getVBuckets());
-        client.tapCustom(null, builder.getMessage(), null, null);
+        client.tapCustom(null, builder.getMessage());
       } else if (tableName.startsWith("BACKFILL_")) {
         String time = tableName.substring("BACKFILL_".length(),
             tableName.length());
         builder.doBackfill(0);
         builder.supportAck();
         builder.specifyVbuckets(((CouchbaseInputSplit)split).getVBuckets());
-        Operation op = client.tapCustom(null, builder.getMessage(), null,
-            null);
+        Operation op = client.tapCustom(null, builder.getMessage());
         createTapStreamTimeout(op, (new Long(time)).intValue());
       }
     } catch (ConfigurationException e) {
