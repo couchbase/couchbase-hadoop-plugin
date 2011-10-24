@@ -206,8 +206,8 @@
   <target name="package" depends="ivy-init, jar" description="Packages files for distribution">
     <mkdir dir="${dist.dir}" />
     <copy file="${etc.dir}/documentation.pdf" todir="${dist.dir}" />
-    <copy file="${etc.dir}/couchsqoop-config.xml" todir="${dist.dir}" />
-    <copy file="${etc.dir}/couchsqoop-manager" todir="${dist.dir}" />
+    <copy file="${etc.dir}/couchbase-config.xml" todir="${dist.dir}" />
+    <copy file="${etc.dir}/couchbase-manager.xml" todir="${dist.dir}" />
     <copy file="${build.ivy.lib.dir}/${name}/common/spymemcached-${spymemcached.version}.jar"
         todir="${dist.dir}" />
     <copy file="${build.ivy.lib.dir}/${name}/common/jettison-${jettison.version}.jar"

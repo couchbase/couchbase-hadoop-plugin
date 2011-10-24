@@ -25,8 +25,8 @@ function check_file_exists {
   fi
 }
 
-f_config=$PWD/couchsqoop-config.xml
-f_manager=$PWD/couchsqoop-manager
+f_config=$PWD/couchbase-config.xml
+f_manager=$PWD/couchbase-manager.xml
 f_plugin=$PWD/couchbase-hadoop-plugin-1.0.jar
 
 if [ $# -ne 1 ]; then
