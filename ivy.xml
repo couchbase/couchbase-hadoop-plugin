@@ -65,8 +65,10 @@
         conf="common->master"/>
     <dependency org="hsqldb" name="hsqldb" rev="${hsqldb.version}"
         conf="common->master"/>
+    <dependency org="couchbase" name="couchbase-client" rev="${couchbase-client.version}"
+        conf="common->default"/>
     <dependency org="spy" name="spymemcached" rev="${spymemcached.version}"
-        conf="common->master"/>
+        conf="common->default"/>
     <dependency org="commons-httpclient" name="commons-httpclient"
         rev="${commons-httpclient.version}" conf="common->master"/>
 

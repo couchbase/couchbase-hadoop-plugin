@@ -18,13 +18,13 @@ package com.couchbase.sqoop.mapreduce.db;
 
 import com.cloudera.sqoop.config.ConfigurationHelper;
 
+import com.couchbase.client.CouchbaseClient;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.spy.memcached.MembaseClient;
 
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
@@ -86,7 +86,7 @@ public class CouchbaseInputFormat<T extends DBWritable> extends
       InterruptedException {
     List<URI> baseUris = new LinkedList<URI>();
     baseUris.add(URI.create(dbConf.getUrlProperty()));
-    MembaseClient client = new MembaseClient(baseUris, dbConf.getUsername(),
+    CouchbaseClient client = new CouchbaseClient(baseUris, dbConf.getUsername(),
         dbConf.getPassword());
     int numVBuckets = client.getNumVBuckets();
     client.shutdown();

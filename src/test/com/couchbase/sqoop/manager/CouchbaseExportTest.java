@@ -27,8 +27,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
-import net.spy.memcached.MembaseClient;
-import net.spy.memcached.MemcachedClient;
+import com.couchbase.client.CouchbaseClient;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +40,7 @@ public class CouchbaseExportTest extends TestExport {
 
   private CouchbaseManager manager;
 
-  private MemcachedClient mc;
+  private CouchbaseClient cb;
 
   @Override
   protected Connection getConnection() {
@@ -73,7 +72,7 @@ public class CouchbaseExportTest extends TestExport {
     String pass = CouchbaseUtils.COUCHBASE_USER_PASS;
 
     try {
-      mc = new MembaseClient(Arrays.asList(new URI(connStr)), user, user, pass);
+      cb = new CouchbaseClient(Arrays.asList(new URI(connStr)), user, user, pass);
     } catch (IOException e) {
       fail("Couldn't connect to Couchbase Server");
     } catch (URISyntaxException e) {
@@ -84,7 +83,7 @@ public class CouchbaseExportTest extends TestExport {
   @After
   public void tearDown() {
     super.tearDown();
-    mc.shutdown();
+    cb.shutdown();
 
     if (null != manager) {
       try {
@@ -139,11 +138,11 @@ public class CouchbaseExportTest extends TestExport {
     throws IOException, SQLException {
     try {
       for (int i = 0; i < expectedNumRecords; i++) {
-        if (mc.get(i + "") == null) {
+        if (cb.get(i + "") == null) {
           fail("Failed to get an exported key from Couchbase: Tried 5 times");
         }
       }
-      if (!mc.flush().get().booleanValue()) {
+      if (!cb.flush().get().booleanValue()) {
         fail("Unable to flush keys");
       }
     } catch (InterruptedException e) {

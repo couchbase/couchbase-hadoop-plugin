@@ -31,8 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import net.spy.memcached.MembaseClient;
-import net.spy.memcached.MemcachedClient;
+import com.couchbase.client.CouchbaseClient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,7 +51,7 @@ public class CouchbaseManagerTest extends ImportJobTestCase {
   private static final String TABLE_NAME = "DUMP";
   private static final int NUM_RECORDS = 5;
 
-  private MemcachedClient mc;
+  private CouchbaseClient cb;
 
   @Before
   public void setUp() {
@@ -62,7 +61,7 @@ public class CouchbaseManagerTest extends ImportJobTestCase {
       URI uri = new URI(CouchbaseUtils.CONNECT_STRING);
       String user = CouchbaseUtils.COUCHBASE_USER_NAME;
       String pass = CouchbaseUtils.COUCHBASE_USER_PASS;
-      mc = new MembaseClient(Arrays.asList(uri), user, user, pass);
+      cb = new CouchbaseClient(Arrays.asList(uri), user, user, pass);
     } catch (URISyntaxException e) {
       LOG.error("Bad URL" + e.getMessage());
       fail(e.toString());
@@ -74,7 +73,7 @@ public class CouchbaseManagerTest extends ImportJobTestCase {
 
   @After
   public void tearDown() {
-    mc.shutdown();
+    cb.shutdown();
   }
 
   private String[] getArgv() {
@@ -106,7 +105,7 @@ public class CouchbaseManagerTest extends ImportJobTestCase {
     for (int i = 0; i < NUM_RECORDS; i++) {
       String kv = i + "";
       expectedResults.put(kv, kv);
-      mc.set(kv, 0, kv);
+      cb.set(kv, 0, kv);
     }
 
     runCouchbaseTest(expectedResults);

@@ -16,6 +16,8 @@
 
 package com.couchbase.sqoop.mapreduce.db;
 
+import com.couchbase.client.TapClient;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -27,10 +29,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.naming.ConfigurationException;
 
-import net.spy.memcached.TapClient;
-import net.spy.memcached.ops.Operation;
+
 import net.spy.memcached.tapmessage.MessageBuilder;
 import net.spy.memcached.tapmessage.ResponseMessage;
+import net.spy.memcached.tapmessage.TapStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -82,7 +84,7 @@ public class CouchbaseRecordReader<T extends DBWritable>
       String pass = dbConf.getPassword();
       String url = dbConf.getUrlProperty();
       this.client = new TapClient(Arrays.asList(new URI(url)), user,
-          user, pass);
+          pass);
     } catch (URISyntaxException e) {
       LOG.error("Bad URI Syntax: " + e.getMessage());
       client.shutdown();
@@ -133,8 +135,8 @@ public class CouchbaseRecordReader<T extends DBWritable>
         builder.doBackfill(0);
         builder.supportAck();
         builder.specifyVbuckets(((CouchbaseInputSplit)split).getVBuckets());
-        Operation op = client.tapCustom(null, builder.getMessage());
-        createTapStreamTimeout(op, (new Long(time)).intValue());
+        TapStream tapStream = client.tapCustom(null, builder.getMessage());
+        createTapStreamTimeout(tapStream, (new Long(time)).intValue());
       }
     } catch (ConfigurationException e) {
       LOG.error("Couldn't Configure Tap Stream: " + e.getMessage());
@@ -145,7 +147,7 @@ public class CouchbaseRecordReader<T extends DBWritable>
     }
   }
 
-  private void createTapStreamTimeout(final Operation op,
+  private void createTapStreamTimeout(final TapStream tapStream,
       final long duration) {
     if (duration > 0) {
       Runnable r = new Runnable() {
@@ -159,7 +161,7 @@ public class CouchbaseRecordReader<T extends DBWritable>
             LOG.error("Tap stream closing early. Reason: "
               + e.getMessage());
           }
-          op.cancel();
+          tapStream.cancel();
         }
       };
       new Thread(r).start();

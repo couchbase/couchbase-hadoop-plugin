@@ -18,6 +18,8 @@ package com.couchbase.sqoop.mapreduce.db;
 
 import com.cloudera.sqoop.mapreduce.db.DBConfiguration;
 
+import com.couchbase.client.CouchbaseClient;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
@@ -31,7 +33,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import net.spy.memcached.MembaseClient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -101,7 +102,7 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       }
     }
 
-    private MembaseClient client;
+    private CouchbaseClient client;
 
     private BlockingQueue<KV> opQ;
 
@@ -111,7 +112,7 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       String url = dbConf.getUrlProperty();
       opQ = new LinkedBlockingQueue<KV>();
       try {
-        client = new MembaseClient(Arrays.asList(new URI(url)),
+        client = new CouchbaseClient(Arrays.asList(new URI(url)),
             user, user, pass);
       } catch (IOException e) {
         client.shutdown();

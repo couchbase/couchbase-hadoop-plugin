@@ -209,6 +209,8 @@
     <copy file="${etc.dir}/couchbase-config.xml" todir="${dist.dir}" />
     <copy file="${etc.dir}/couchbase-manager.xml" todir="${dist.dir}" />
     <copy file="${build.ivy.lib.dir}/${name}/common/spymemcached-${spymemcached.version}.jar"
+      todir="${dist.dir}" />
+    <copy file="${build.ivy.lib.dir}/${name}/common/couchbase-client-${couchbase-client.version}.jar"
         todir="${dist.dir}" />
     <copy file="${build.ivy.lib.dir}/${name}/common/jettison-${jettison.version}.jar"
         todir="${dist.dir}" />
