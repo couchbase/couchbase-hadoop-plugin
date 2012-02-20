@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Couchbase, Inc.
+ * Copyright 2011-2012 Couchbase, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.cloudera.sqoop.mapreduce.db.DBConfiguration;
 import com.cloudera.sqoop.mapreduce.db.DBInputFormat.NullDBWritable;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.db.DBWritable;
 
 /**
@@ -83,5 +84,9 @@ public class CouchbaseConfiguration {
 
   public void setOutputTableName(String tableName) {
     conf.set(DBConfiguration.OUTPUT_TABLE_NAME_PROPERTY, tableName);
+  }
+
+  public void setMapperClass(Class<? extends Mapper> mapperClass) {
+    conf.setClass("mapreduce.map.class", mapperClass, Mapper.class);
   }
 }

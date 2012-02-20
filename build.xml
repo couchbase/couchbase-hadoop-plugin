@@ -1,5 +1,5 @@
 <!--
-  Copyright 2011 Couchbase, Inc.
+  Copyright 2011-2012 Couchbase, Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
   <!-- Directory variables -->
   <property name="name" value="couchbase-hadoop-plugin"/>
-  <property name="version" value="1.0"/>
+  <property name="version" value="1.1-dp"/>
   <property name="lib.dir" value="${basedir}/lib" />
   <property name="ivy.dir" location="${basedir}/ivy" />
   <property name="build.dir" value="${basedir}/build" />

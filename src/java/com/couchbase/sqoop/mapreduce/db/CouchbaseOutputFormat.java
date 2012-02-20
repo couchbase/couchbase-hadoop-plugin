@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Couchbase, Inc.
+ * Copyright 2011-2012 Couchbase, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,25 @@ package com.couchbase.sqoop.mapreduce.db;
 import com.cloudera.sqoop.mapreduce.db.DBConfiguration;
 
 import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import net.spy.memcached.internal.OperationFuture;
 
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.OutputFormat;
@@ -92,10 +92,10 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
 
     final class KV {
       private String key;
-      private String value;
+      private Object value;
       private Future<Boolean> status;
 
-      private KV(String key, String value, Future<Boolean> status) {
+      private KV(String key, Object value, Future<Boolean> status) {
         this.key = key;
         this.value = value;
         this.status = status;
@@ -111,15 +111,21 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       String pass = dbConf.getPassword();
       String url = dbConf.getUrlProperty();
       opQ = new LinkedBlockingQueue<KV>();
+      CouchbaseConnectionFactoryBuilder cfb =
+        new CouchbaseConnectionFactoryBuilder();
+      cfb.setOpTimeout(10000);  // wait up to 10 seconds for an op to succeed
+      cfb.setOpQueueMaxBlockTime(60000); // wait up to 1 minute to enqueue
       try {
-        client = new CouchbaseClient(Arrays.asList(new URI(url)),
-            user, user, pass);
+        List<URI> baselist = Arrays.asList(new URI(url));
+        client = new CouchbaseClient(cfb.buildCouchbaseConnection(baselist,
+            user, user, pass));
       } catch (IOException e) {
         client.shutdown();
-        e.printStackTrace();
+        LOG.fatal("Problem configuring CouchbaseClient for IO.", e);
       } catch (URISyntaxException e) {
         client.shutdown();
-        e.printStackTrace();
+        LOG.fatal("Could not configure CouchbaseClient with URL supplied: "
+          + url, e);
       }
     }
 
@@ -132,7 +138,7 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       client.shutdown();
     }
 
-    private void drainQ() {
+    private void drainQ() throws IOException {
       Queue<KV> list = new LinkedList<KV>();
       opQ.drainTo(list, opQ.size());
 
@@ -140,58 +146,44 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       while ((kv = list.poll()) != null) {
         try {
           if (!kv.status.get().booleanValue()) {
-            Thread.sleep(10);
             opQ.add(new KV(kv.key, kv.value, client.set(kv.key, 0, kv.value)));
             LOG.info("Failed");
           }
         } catch (RuntimeException e) {
-          LOG.info("RuntimeException " + e.getMessage());
-          opQ.add(new KV(kv.key, kv.value, client.set(kv.key, 0, kv.value)));
-          while ((kv = list.poll()) != null) {
-            opQ.add(new KV(kv.key, kv.value, client.set(kv.key, 0, kv.value)));
-          }
-        } catch (Exception e) {
-          LOG.info("Exception " + e.getMessage());
-          opQ.add(new KV(kv.key, kv.value, client.set(kv.key, 0, kv.value)));
-          while ((kv = list.poll()) != null) {
-            opQ.add(new KV(kv.key, kv.value, client.set(kv.key, 0, kv.value)));
-          }
+          LOG.fatal("Failed to export record. " + e.getMessage());
+          throw new IOException("Failed to export record", e);
+        } catch (InterruptedException e) {
+          LOG.fatal("Interrupted during record export. " + e.getMessage());
+          throw new IOException("Interrupted during record export", e);
+        } catch (ExecutionException e) {
+          LOG.fatal("Aborted execution during record export. "
+            + e.getMessage());
+          throw new IOException("Aborted execution during record export", e);
         }
       }
     }
 
     @Override
     public void write(K key, V value) throws IOException, InterruptedException {
-      String k = null;
-      String v = null;
-      Writable w = (Writable)key;
-      ByteArrayOutputStream in = new ByteArrayOutputStream();
-      DataOutput dataIn = new DataOutputStream(in);
-      w.write(dataIn);
-      byte[] b = in.toByteArray();
+      String keyToAdd = null;
+      Object valueToAdd = null;
 
       if (opQ.size() > 10000) {
         drainQ();
       }
 
-      int i = 0;
-      if (b[i] == 0) {
-        int klen = b[++i];
-        byte[] mkey = new byte[klen];
-        for (int j = 0; j < klen; j++) {
-          mkey[j] = b[++i];
-        }
-        k = new String(mkey);
+      keyToAdd = key.toString();
+      valueToAdd = value;
+      OperationFuture<Boolean> arecord = null;
+
+      try {
+        arecord = client.set(keyToAdd, 0, valueToAdd);
+        opQ.add(new KV(keyToAdd, valueToAdd, arecord));
+      } catch (IllegalArgumentException e) {
+        LOG.error("Failed to write record " + arecord.getKey(), e);
+        LOG.error("Status of failed record is " + arecord.getStatus());
+        throw new IOException("Failed to write record", e);
       }
-      if (b[++i] == 0) {
-        int vlen = b[++i];
-        byte[] mvalue = new byte[vlen];
-        for (int j = 0; j < vlen; j++) {
-          mvalue[j] = b[++i];
-        }
-        v = new String(mvalue);
-      }
-      opQ.add(new KV(k, v, client.set(k, 0, v)));
     }
   }
 }

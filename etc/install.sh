@@ -1,6 +1,6 @@
 #bin/bash
 
-# Copyright 2011 Couchbase, Inc.
+# Copyright 2011-2012 Couchbase, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ function check_file_exists {
 
 f_config=$PWD/couchbase-config.xml
 f_manager=$PWD/couchbase-manager.xml
-f_plugin=$PWD/couchbase-hadoop-plugin-1.0.jar
+f_plugin=$PWD/couchbase-hadoop-plugin-1.1-dp.jar
 
 if [ $# -ne 1 ]; then
   echo "usage: ./install.sh path_to_sqoop_home"

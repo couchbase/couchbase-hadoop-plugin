@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Couchbase, Inc.
+ * Copyright 2011-2012 Couchbase, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,6 +148,7 @@ public class CouchbaseManager extends ConnManager {
   /**
    * Export data stored in HDFS into Membase/Couchbase.
    */
+  @Override
   public void exportTable(ExportJobContext context) throws IOException,
       ExportException {
     context.setConnManager(this);

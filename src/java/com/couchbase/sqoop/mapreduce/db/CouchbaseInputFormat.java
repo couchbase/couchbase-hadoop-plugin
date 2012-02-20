@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Couchbase, Inc.
+ * Copyright 2011-2012 Couchbase, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package com.couchbase.sqoop.mapreduce.db;
 
 import com.cloudera.sqoop.config.ConfigurationHelper;
-
 import com.couchbase.client.CouchbaseClient;
+import com.couchbase.sqoop.mapreduce.CouchbaseImportMapper;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
@@ -44,7 +44,7 @@ import org.apache.hadoop.mapreduce.lib.db.DBWritable;
  *
  */
 public class CouchbaseInputFormat<T extends DBWritable> extends
-    InputFormat<LongWritable, T> implements Configurable {
+    InputFormat<Text, T> implements Configurable {
 
   private String tableName;
 
@@ -53,6 +53,7 @@ public class CouchbaseInputFormat<T extends DBWritable> extends
   @Override
   public void setConf(Configuration conf) {
     dbConf = new CouchbaseConfiguration(conf);
+    dbConf.setMapperClass(CouchbaseImportMapper.class);
     tableName = dbConf.getInputTableName();
   }
 
@@ -67,13 +68,13 @@ public class CouchbaseInputFormat<T extends DBWritable> extends
 
   @Override
   /** {@inheritDoc} */
-  public RecordReader<LongWritable, T> createRecordReader(InputSplit split,
+  public RecordReader<Text, T> createRecordReader(InputSplit split,
       TaskAttemptContext context) throws IOException, InterruptedException {
     return createRecordReader(split, context.getConfiguration());
   }
 
   @SuppressWarnings("unchecked")
-  public RecordReader<LongWritable, T> createRecordReader(InputSplit split,
+  public RecordReader<Text, T> createRecordReader(InputSplit split,
       Configuration conf)
     throws IOException, InterruptedException {
     Class<T> inputClass = (Class<T>) (dbConf.getInputClass());
