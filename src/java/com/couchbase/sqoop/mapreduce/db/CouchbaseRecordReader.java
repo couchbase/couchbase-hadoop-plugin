@@ -103,7 +103,7 @@ public class CouchbaseRecordReader<T extends DBWritable>
 
   @Override
   public T getCurrentValue() throws IOException, InterruptedException {
-    LOG.info("Value: " + value);
+    LOG.info("Value: " + value.toString());
     return value;
   }
 
