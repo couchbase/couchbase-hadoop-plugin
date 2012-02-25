@@ -152,8 +152,8 @@
       <fileset dir="${basedir}" includes="EXPORT_TABLE_*.java" />
     </delete>
     <mkdir  dir="${junit.dir}/data"/>
-    <junit fork="yes" haltonfailure="no">
-      <batchtest fork="yes">
+    <junit fork="yes" haltonfailure="yes">
+      <batchtest todir="${junit.dir}/data" fork="yes">
         <fileset dir="${test.dir}">
           <include name="**/*Test.java" />
         </fileset>
