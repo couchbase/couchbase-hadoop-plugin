@@ -154,7 +154,7 @@
         </fileset>
       </batchtest>
       <jvmarg value="-ea" />
-      <sysproperty key="hadoop.root.logger" value="DEBUG,console" />
+      <sysproperty key="hadoop.root.logger" value="INFO,console" />
       <sysproperty key="sqoop.test.couchbase.connectstring"
           value="${sqoop.test.couchbase.connectstring}"/>
       <formatter type="plain" usefile="false" />
