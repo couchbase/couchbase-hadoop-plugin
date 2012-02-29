@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-com.couchbase.sqoop.manager.CouchbaseFactory=lib/couchbase-hadoop-plugin-1.1-dp.jar
+com.couchbase.sqoop.manager.CouchbaseFactory=lib/couchbase-hadoop-plugin-1.1-dp2.jar
