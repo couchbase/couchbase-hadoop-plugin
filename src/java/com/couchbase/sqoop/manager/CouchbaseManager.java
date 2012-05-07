@@ -64,7 +64,7 @@ public class CouchbaseManager extends ConnManager {
 
   @Override
   public String[] listTables() {
-    return new String[] { "DUMP", "BACKFILL_5" };
+    return new String[] { "DUMP", "BACKFILL_NN" };
   }
 
   @Override
@@ -113,7 +113,7 @@ public class CouchbaseManager extends ConnManager {
 
   @Override
   public void execAndPrint(String s) {
-    LOG.info("Couchbase server doesn't handle SQL");
+    LOG.warn("Couchbase server doesn't handle SQL");
   }
 
   @Override
@@ -172,4 +172,5 @@ public class CouchbaseManager extends ConnManager {
   @Override
   public void release() {
   }
+
 }
