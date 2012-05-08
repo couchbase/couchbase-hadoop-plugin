@@ -33,11 +33,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.util.StringUtils;
 
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.OutputFormat;
@@ -177,11 +179,35 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       OperationFuture<Boolean> arecord = null;
 
       try {
-        arecord = client.set(keyToAdd, 0, valueToAdd);
+        StringUtils.validateKey(keyToAdd);
+      } catch (IllegalArgumentException ex) {
+        // warn and try to transform the key
+        String replacement = keyToAdd.replace(" ", "_");
+        replacement = replacement.replace("\n", "");
+        replacement = replacement.replace("\r", "");
+        replacement = replacement.replace("\t", "-");
+        LOG.warn("Key to record supplied invalid.  Will attempt to transform."
+                + " Replacing: \"" + keyToAdd + "\" with \"" + replacement
+                + "\"");
+        keyToAdd = replacement;
+      }
+
+      try {
+        if (value instanceof NullWritable) { // store NullWritable as empty string
+          LOG.warn("Value to be stored is null, storing empty string as a replacement.");
+          arecord = client.set(keyToAdd, 0, "");
+        } else {
+          arecord = client.set(keyToAdd, 0, valueToAdd);
+        }
         opQ.add(new KV(keyToAdd, valueToAdd, arecord));
-      } catch (IllegalArgumentException e) {
-        LOG.error("Failed to write record " + arecord.getKey(), e);
-        LOG.error("Status of failed record is " + arecord.getStatus());
+      }
+      catch (IllegalArgumentException e) {
+        LOG.error("Tried to store key " + key.toString()
+                + " with class type canonical " + value.getClass().getCanonicalName() + " and simple name " + value.getClass().getSimpleName());
+        if (arecord != null) {
+          LOG.error("Failed to write record " + arecord.getKey(), e);
+          LOG.error("Status of failed record is " + arecord.getStatus());
+        }
         throw new IOException("Failed to write record", e);
       }
     }

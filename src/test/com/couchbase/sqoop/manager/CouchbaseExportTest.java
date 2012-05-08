@@ -137,9 +137,12 @@ public class CouchbaseExportTest extends TestExport {
   protected void verifyExport(int expectedNumRecords)
     throws IOException, SQLException {
     try {
+      System.err.println("Going to get " + expectedNumRecords);
       for (int i = 0; i < expectedNumRecords; i++) {
-        if (cb.get(i + "") == null) {
-          fail("Failed to get an exported key from Couchbase: Tried 5 times");
+        String toGet = i + "-" + getMsgPrefix() + i; // assumes transformed
+        if (cb.get(toGet) == null) {
+          fail("Failed to get an exported key from Couchbase.  Could not get "
+            + toGet + " from connection " + cb.getNodeLocator().getPrimary(toGet));
         }
       }
       if (!cb.flush().get().booleanValue()) {
