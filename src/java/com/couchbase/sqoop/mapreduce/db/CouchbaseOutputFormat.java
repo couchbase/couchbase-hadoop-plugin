@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -119,6 +120,11 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       cfb.setOpQueueMaxBlockTime(60000); // wait up to 1 minute to enqueue
       try {
         List<URI> baselist = Arrays.asList(new URI(url));
+        // Tell things using Spy's logging to use log4j compat, hadoop uses log4j
+        Properties spyLogProperties = System.getProperties();
+        spyLogProperties.put("net.spy.log.LoggerImpl",
+          "net.spy.memcached.compat.log.Log4JLogger");
+        System.setProperties(spyLogProperties);
         client = new CouchbaseClient(cfb.buildCouchbaseConnection(baselist,
             user, user, pass));
       } catch (IOException e) {

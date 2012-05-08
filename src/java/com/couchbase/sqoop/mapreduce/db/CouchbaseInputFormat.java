@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
@@ -87,6 +88,10 @@ public class CouchbaseInputFormat<T extends DBWritable> extends
       InterruptedException {
     List<URI> baseUris = new LinkedList<URI>();
     baseUris.add(URI.create(dbConf.getUrlProperty()));
+    // Tell things using Spy's logging to use log4j compat, hadoop uses log4j
+    Properties spyLogProperties = System.getProperties();
+    spyLogProperties.put("net.spy.log.LoggerImpl", "net.spy.memcached.compat.log.Log4JLogger");
+    System.setProperties(spyLogProperties);
     CouchbaseClient client = new CouchbaseClient(baseUris, dbConf.getUsername(),
         dbConf.getPassword());
     int numVBuckets = client.getNumVBuckets();
