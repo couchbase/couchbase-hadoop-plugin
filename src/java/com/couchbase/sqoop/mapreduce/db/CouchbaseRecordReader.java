@@ -134,6 +134,9 @@ public class CouchbaseRecordReader<T extends DBWritable>
         builder.specifyVbuckets(((CouchbaseInputSplit)split).getVBuckets());
         TapStream tapStream = client.tapCustom(null, builder.getMessage());
         createTapStreamTimeout(tapStream, (new Long(time)).intValue());
+      } else {
+        throw new IOException("Table name must be \"DUMP\" or begin with "
+          + "\"BACKFILL_\" followed by an integer.");
       }
     } catch (ConfigurationException e) {
       LOG.error("Couldn't Configure Tap Stream: " + e.getMessage());
