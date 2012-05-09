@@ -208,10 +208,12 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
         opQ.add(new KV(keyToAdd, valueToAdd, arecord));
       }
       catch (IllegalArgumentException e) {
-        LOG.error("Tried to store key " + key.toString()
-                + " with class type canonical " + value.getClass().getCanonicalName() + " and simple name " + value.getClass().getSimpleName());
+        LOG.error("Failed to write record with key \"" + key.toString()
+          + "\" with class type canonical "
+          + value.getClass().getCanonicalName() + " and simple name "
+          + value.getClass().getSimpleName());
         if (arecord != null) {
-          LOG.error("Failed to write record " + arecord.getKey(), e);
+          LOG.error("Failed to write record: \"" + arecord.getKey() + "\"", e);
           LOG.error("Status of failed record is " + arecord.getStatus());
         }
         throw new IOException("Failed to write record", e);
