@@ -16,6 +16,7 @@
 
 package com.couchbase.sqoop.mapreduce.db;
 
+import com.cloudera.sqoop.lib.SqoopRecord;
 import com.cloudera.sqoop.mapreduce.db.DBConfiguration;
 
 import com.couchbase.client.CouchbaseClient;
@@ -27,6 +28,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -41,12 +43,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.mapred.lib.db.DBWritable;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.db.DBWritable;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
@@ -77,7 +79,7 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
   public OutputCommitter getOutputCommitter(TaskAttemptContext context)
     throws IOException, InterruptedException {
     return new FileOutputCommitter(FileOutputFormat.getOutputPath(context),
-        context);
+        context); // TODO: see if this can be removed.  It doesn't hurt.
   }
 
   @Override
@@ -177,11 +179,14 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       Object valueToAdd = null;
 
       if (opQ.size() > 10000) {
-        drainQ();
+        drainQ(); // TODO: probably don't need this with new queue tuning
       }
 
-      keyToAdd = key.toString();
-      valueToAdd = value;
+      SqoopRecord recordToExport = (SqoopRecord)key;
+      Map<String, Object> recordFields = recordToExport.getFieldMap();
+
+      keyToAdd = recordFields.get("Key").toString();
+      valueToAdd = recordFields.get("Value");
       OperationFuture<Boolean> arecord = null;
 
       try {

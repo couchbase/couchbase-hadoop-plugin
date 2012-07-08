@@ -139,7 +139,7 @@ public class CouchbaseExportTest extends TestExport {
     try {
       System.err.println("Going to get " + expectedNumRecords);
       for (int i = 0; i < expectedNumRecords; i++) {
-        String toGet = i + "-" + getMsgPrefix() + i; // assumes transformed
+        String toGet = Integer.toString(i);
         if (cb.get(toGet) == null) {
           fail("Failed to get an exported key from Couchbase.  Could not get "
             + toGet + " from connection " + cb.getNodeLocator().getPrimary(toGet));
