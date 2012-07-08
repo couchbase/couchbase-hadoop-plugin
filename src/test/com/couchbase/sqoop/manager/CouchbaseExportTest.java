@@ -146,12 +146,14 @@ public class CouchbaseExportTest extends TestExport {
         }
       }
       if (!cb.flush().get().booleanValue()) {
-        fail("Unable to flush keys");
+        fail("Unable to flush keys.  The flush_all command is disabled by "
+          + "default from Couchbase Server version 1.8.1 and on.  Re-enable it"
+          + " for testing.");
       }
     } catch (InterruptedException e) {
-      fail("Interrupted while checking keys");
+      fail("Interrupted while checking keys:" + e.getMessage());
     } catch (ExecutionException e) {
-      fail("Operation failed to flush keys");
+      fail("Operation failed while checking keys:" + e.getMessage());
     }
   }
 
@@ -182,12 +184,12 @@ public class CouchbaseExportTest extends TestExport {
   @Test
   @Override
   public void testMultiTransactionWithStaging() {
-    // CouchSqoop doesn't support staging tables
+    // Couchbase doesn't support staging tables
   }
 
   @Test
   @Override
   public void testMultiMapTextExportWithStaging() {
-    // CouchSqoop doesn't support staging tables
+    // Couchbase doesn't support staging tables
   }
 }

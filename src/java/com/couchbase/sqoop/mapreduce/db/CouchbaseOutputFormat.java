@@ -204,8 +204,9 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       }
 
       try {
-        if (value instanceof NullWritable) { // store NullWritable as empty string
-          LOG.warn("Value to be stored is null, storing empty string as a replacement.");
+        if (value instanceof NullWritable) {
+          LOG.warn("Value to be stored is null, storing empty string as a "
+            + "replacement.");
           arecord = client.set(keyToAdd, 0, "");
         } else {
           arecord = client.set(keyToAdd, 0, valueToAdd);
