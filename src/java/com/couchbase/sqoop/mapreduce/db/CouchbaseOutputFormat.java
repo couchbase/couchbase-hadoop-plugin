@@ -176,7 +176,7 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
     @Override
     public void write(K key, V value) throws IOException, InterruptedException {
       String keyToAdd = null;
-      Object valueToAdd = null;
+      Object valueToSet = null;
 
       if (opQ.size() > 10000) {
         drainQ(); // TODO: probably don't need this with new queue tuning
@@ -186,7 +186,7 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       Map<String, Object> recordFields = recordToExport.getFieldMap();
 
       keyToAdd = recordFields.get("Key").toString();
-      valueToAdd = recordFields.get("Value");
+      valueToSet = recordFields.get("Value");
       OperationFuture<Boolean> arecord = null;
 
       try {
@@ -204,14 +204,14 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       }
 
       try {
-        if (value instanceof NullWritable) {
-          LOG.warn("Value to be stored is null, storing empty string as a "
-            + "replacement.");
+        if (valueToSet == null) {
+          LOG.warn("Value to be stored for key \"" + keyToAdd + "\" "
+                  + " is null, storing empty string as a replacement.");
           arecord = client.set(keyToAdd, 0, "");
         } else {
-          arecord = client.set(keyToAdd, 0, valueToAdd);
+          arecord = client.set(keyToAdd, 0, valueToSet);
         }
-        opQ.add(new KV(keyToAdd, valueToAdd, arecord));
+        opQ.add(new KV(keyToAdd, valueToSet, arecord));
       }
       catch (IllegalArgumentException e) {
         LOG.error("Failed to write record with key \"" + key.toString()
