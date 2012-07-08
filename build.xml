@@ -159,6 +159,7 @@
         </fileset>
       </batchtest>
       <jvmarg value="-ea" />
+      <!-- jvmarg line="-ea -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000" / -->
       <sysproperty key="hadoop.root.logger" value="INFO,console" />
       <sysproperty key="sqoop.test.couchbase.connectstring"
           value="${sqoop.test.couchbase.connectstring}"/>
