@@ -19,6 +19,7 @@ package com.couchbase.sqoop.manager;
 import com.cloudera.sqoop.testutil.CommonArgs;
 import com.cloudera.sqoop.testutil.ImportJobTestCase;
 import com.cloudera.sqoop.util.FileListing;
+import com.couchbase.client.CouchbaseClient;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,8 +31,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import com.couchbase.client.CouchbaseClient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

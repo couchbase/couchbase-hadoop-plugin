@@ -18,6 +18,7 @@ package com.couchbase.sqoop.manager;
 
 import com.cloudera.sqoop.SqoopOptions;
 import com.cloudera.sqoop.TestExport;
+import com.couchbase.client.CouchbaseClient;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,8 +27,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
-
-import com.couchbase.client.CouchbaseClient;
 
 import org.junit.After;
 import org.junit.Before;
@@ -72,7 +71,8 @@ public class CouchbaseExportTest extends TestExport {
     String pass = CouchbaseUtils.COUCHBASE_USER_PASS;
 
     try {
-      cb = new CouchbaseClient(Arrays.asList(new URI(connStr)), user, user, pass);
+      cb = new CouchbaseClient(Arrays.asList(new URI(connStr)), user, user,
+          pass);
     } catch (IOException e) {
       fail("Couldn't connect to Couchbase Server");
     } catch (URISyntaxException e) {
