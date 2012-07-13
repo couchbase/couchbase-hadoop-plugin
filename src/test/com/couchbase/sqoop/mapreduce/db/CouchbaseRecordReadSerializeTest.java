@@ -19,44 +19,50 @@ import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.TapClient;
 import com.couchbase.sqoop.lib.CouchbaseRecordUtil;
 import com.couchbase.sqoop.manager.CouchbaseUtils;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import junit.framework.TestCase;
+
 import net.spy.memcached.tapmessage.ResponseMessage;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+/**
+ * Tests seriaization of values when imported into Hadoop.
+ */
 public class CouchbaseRecordReadSerializeTest extends TestCase {
 
-      public static final Log LOG = LogFactory.getLog(
-      CouchbaseRecordReadSerializeTest.class.getName());
-      private CouchbaseClient cb;
+  public static final Log LOG =
+      LogFactory.getLog(CouchbaseRecordReadSerializeTest.class.getName());
+  private CouchbaseClient cb;
 
-      private TapClient client;
+  private TapClient client;
 
-      private Map<String, ResponseMessage> tappedStuff;
+  private Map<String, ResponseMessage> tappedStuff;
 
-      private Date rightnow;
-      private String dateText;
+  private Date rightnow;
+  private String dateText;
 
   @Before
-    @Override
+  @Override
   public void setUp() throws Exception {
     super.setUp();
 
     tappedStuff = new HashMap<String, ResponseMessage>();
 
-      URI uri = new URI(CouchbaseUtils.CONNECT_STRING);
-      String user = CouchbaseUtils.COUCHBASE_USER_NAME;
-      String pass = CouchbaseUtils.COUCHBASE_USER_PASS;
+    URI uri = new URI(CouchbaseUtils.CONNECT_STRING);
+    String user = CouchbaseUtils.COUCHBASE_USER_NAME;
+    String pass = CouchbaseUtils.COUCHBASE_USER_PASS;
 
     try {
       cb = new CouchbaseClient(Arrays.asList(uri), user, pass);
@@ -64,10 +70,10 @@ public class CouchbaseRecordReadSerializeTest extends TestCase {
       LOG.error("Couldn't connect to server" + e.getMessage());
       fail(e.toString());
     }
-      this.client = new TapClient(Arrays.asList(uri), user, pass);
+    this.client = new TapClient(Arrays.asList(uri), user, pass);
 
-      cb.flush();
-      Thread.sleep(500);
+    cb.flush();
+    Thread.sleep(500);
 
 
     // set up the items we're going to deserialize
@@ -80,11 +86,11 @@ public class CouchbaseRecordReadSerializeTest extends TestCase {
     Float afloat = new Float(Float.MAX_VALUE);
     cb.set(afloat.toString(), 0, afloat).get();
 
-    Double DOUBLEBASE = new Double(Double.NEGATIVE_INFINITY);
-    cb.set(DOUBLEBASE.toString(), 0, DOUBLEBASE).get();
+    Double doubleBase = new Double(Double.NEGATIVE_INFINITY);
+    cb.set(doubleBase.toString(), 0, doubleBase).get();
 
-    Boolean BOOLEANBASE = true;
-    cb.set(BOOLEANBASE.toString(), 0, BOOLEANBASE).get();
+    Boolean booleanBase = true;
+    cb.set(booleanBase.toString(), 0, booleanBase).get();
 
     rightnow = new Date(); // instance, needed later
     dateText = rightnow.toString().replaceAll(" ", "_");
@@ -98,33 +104,31 @@ public class CouchbaseRecordReadSerializeTest extends TestCase {
 
     client.tapDump("tester");
     while (client.hasMoreMessages()) {
-        ResponseMessage m = client.getNextMessage();
-        if (m == null) {
-            continue;
-        }
-        tappedStuff.put(m.getKey(), m);
+      ResponseMessage m = client.getNextMessage();
+      if (m == null) {
+        continue;
+      }
+      tappedStuff.put(m.getKey(), m);
     }
   }
 
   @After
-    @Override
+  @Override
   public void tearDown() {
     cb.shutdown();
     client.shutdown();
   }
 
-    @Test
-    public void testDeserializer() {
-        for (Map.Entry<String, ResponseMessage> entry : tappedStuff.entrySet()) {
-            if (entry.getKey().matches(dateText)) {
-                assertEquals("Could not verify", dateText,
-                  (CouchbaseRecordUtil.deserialize(entry.getValue()).toString().replaceAll(" ", "_")));
-            } else {
-            assertEquals("Could not verify ", entry.getKey(),
-              (CouchbaseRecordUtil.deserialize(entry.getValue()).toString()));
-            }
-        }
+  @Test
+  public void testDeserializer() {
+    for (Map.Entry<String, ResponseMessage> entry : tappedStuff.entrySet()) {
+      if (entry.getKey().matches(dateText)) {
+        assertEquals("Could not verify", dateText, CouchbaseRecordUtil
+            .deserialize(entry.getValue()).toString().replaceAll(" ", "_"));
+      } else {
+        assertEquals("Could not verify ", entry.getKey(),
+            (CouchbaseRecordUtil.deserialize(entry.getValue()).toString()));
+      }
     }
-
-
+  }
 }
