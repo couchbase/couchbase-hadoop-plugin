@@ -27,7 +27,7 @@ function check_file_exists {
 
 f_config=$PWD/couchbase-config.xml
 f_manager=$PWD/couchbase-manager.xml
-f_plugin=$PWD/couchbase-hadoop-plugin-1.1-dp2.jar
+f_plugin=$PWD/couchbase-hadoop-plugin-1.1-dp3.jar
 
 if [ $# -ne 1 ]; then
   echo "usage: ./install.sh path_to_sqoop_home"
