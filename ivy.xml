@@ -31,7 +31,7 @@
   </configurations>
 
   <dependencies>
-    <dependency org="com.cloudera.sqoop" name="sqoop" rev="${sqoop.version}"
+    <dependency org="org.apache.sqoop" name="sqoop" rev="${sqoop.version}"
         conf="common->master">
       <artifact name="sqoop" type="jar"/>
       <artifact name="sqoop" type="test-jar" ext="jar" m:classifier="tests"/>
@@ -41,6 +41,10 @@
         rev="${hadoop-core.cloudera.version}" conf="common->master"/>
     <dependency org="org.apache.hadoop" name="hadoop-test"
         rev="${hadoop-core.cloudera.version}" conf="common->master"/>
+    <dependency org="org.apache.hadoop" name="hadoop-hdfs"
+        rev="${hadoop.version}" conf="common->master"/>
+    <dependency org="org.apache.hadoop" name="hadoop-common"
+        rev="${hadoop.version}" conf="common->master"/>
 
     <dependency org="org.jboss.netty" name="netty"
         rev="${netty.version}" conf="common->master"/>
