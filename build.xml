@@ -189,7 +189,9 @@
         includes="**/*.java"
         destdir="${build.classes}"
         debug="${javac.debug}"
-        deprecation="${javac.deprecation}">
+        deprecation="${javac.deprecation}"
+        source="1.6"
+        target="1.6">
       <classpath refid="${name}.common.classpath" />
     </javac>
   </target>
@@ -203,7 +205,9 @@
         srcdir="${test.dir}"
         includes="**/*.java"
         destdir="${build.test.classes}"
-        debug="${javac.debug}">
+        debug="${javac.debug}"
+        source="1.6"
+        target="1.6">
       <classpath>
         <path refid="test.classpath"/>
       </classpath>
