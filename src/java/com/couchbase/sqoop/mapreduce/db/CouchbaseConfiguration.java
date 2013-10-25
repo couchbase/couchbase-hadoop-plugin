@@ -16,12 +16,14 @@
 
 package com.couchbase.sqoop.mapreduce.db;
 
-import com.cloudera.sqoop.mapreduce.db.DBConfiguration;
 import com.cloudera.sqoop.mapreduce.db.DBInputFormat.NullDBWritable;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.db.DBWritable;
+import org.apache.sqoop.mapreduce.db.DBConfiguration;
 
 /**
  * A container for configuration property names for jobs with Couchbase
@@ -34,10 +36,10 @@ import org.apache.hadoop.mapreduce.lib.db.DBWritable;
  */
 public class CouchbaseConfiguration {
 
-  private Configuration conf;
+  private JobConf conf;
 
   public CouchbaseConfiguration(Configuration job) {
-    this.conf = job;
+    this.conf = (JobConf) job;
   }
 
   public Configuration getConf() {
@@ -63,7 +65,8 @@ public class CouchbaseConfiguration {
   }
 
   public String getPassword() {
-    return conf.get(DBConfiguration.PASSWORD_PROPERTY, "");
+    Text property = new Text(DBConfiguration.PASSWORD_PROPERTY);
+    return new String(conf.getCredentials().getSecretKey(property));
   }
 
   public void setPassword(String password) {
