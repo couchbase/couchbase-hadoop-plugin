@@ -6,3 +6,19 @@ build/
 DUMP*
 EXPORT_TABLE*
 lib/ivy*
+
+# IDE Support
+# IntelliJ specific files/directories
+.idea/
+*.ipr
+*.iws
+*.iml
+atlassian-ide-plugin.xml
+
+# Eclipse
+.factorypath
+.settings/
+.externalToolBuilders
+
+# NetBeans
+.nbattrs
