@@ -66,7 +66,7 @@ public class CouchbaseConfiguration {
 
   public String getPassword() {
     Text property = new Text(DBConfiguration.PASSWORD_PROPERTY);
-    return new String(conf.getCredentials().getSecretKey(property));
+    return new String(conf.getCredentials().getSecretKey(property)).trim();
   }
 
   public void setPassword(String password) {
