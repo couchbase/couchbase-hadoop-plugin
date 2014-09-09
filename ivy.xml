@@ -76,17 +76,6 @@
     <dependency org="commons-httpclient" name="commons-httpclient"
         rev="${commons-httpclient.version}" conf="common->master"/>
 
-    <dependency org="org.apache.hbase" name="hbase" rev="${hbase.version}"
-        conf="common->master">
-      <artifact name="hbase" type="jar"/>
-      <artifact name="hbase" type="test-jar" ext="jar"/>
-      <exclude org="com.sun.jersey" module="jersey-core"/>
-      <exclude org="com.sun.jersey" module="jersey-json"/>
-      <exclude org="com.sun.jersey" module="jersey-server"/>
-      <exclude org="org.apache.thrift" module="thrift"/>
-      <exclude org="log4j" module="log4j"/>
-    </dependency>
-
     <dependency org="checkstyle" name="checkstyle" rev="${checkstyle.version}"
         conf="checkstyle->default" />
   </dependencies>
