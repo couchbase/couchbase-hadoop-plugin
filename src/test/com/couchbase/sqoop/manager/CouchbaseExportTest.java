@@ -192,4 +192,10 @@ public class CouchbaseExportTest extends TestExport {
   public void testMultiMapTextExportWithStaging() {
     // Couchbase doesn't support staging tables
   }
+
+  @Test
+  @Override
+  public void testColumnsExport() throws IOException, SQLException {
+    // Couchbase only has two columns.
+  }
 }
