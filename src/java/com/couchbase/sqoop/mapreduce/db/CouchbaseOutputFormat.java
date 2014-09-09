@@ -190,7 +190,7 @@ public class CouchbaseOutputFormat<K extends DBWritable, V>
       OperationFuture<Boolean> arecord = null;
 
       try {
-        StringUtils.validateKey(keyToAdd);
+        StringUtils.validateKey(keyToAdd,true);
       } catch (IllegalArgumentException ex) {
         // warn and try to transform the key
         String replacement = keyToAdd.replace(" ", "_");
