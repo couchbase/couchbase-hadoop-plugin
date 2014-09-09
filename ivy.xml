@@ -45,11 +45,23 @@
         rev="${hadoop.version}" conf="common->master"/>
     <dependency org="org.apache.hadoop" name="hadoop-common"
         rev="${hadoop.version}" conf="common->master"/>
+    <dependency org="org.apache.hadoop" name="hadoop-auth"
+        rev="${hadoop-auth.cloudera.version}" conf="common->master"/>
 
     <dependency org="io.netty" name="netty"
         rev="${netty.version}" conf="common->master"/>
+      <dependency org="com.google.guava" name="guava-bootstrap"
+                  rev="${guava-bootstrap.version}" conf="common->master"/>
+    <dependency org="com.google.guava" name="guava"
+        rev="${guava.version}" conf="common->master"/>
+    <dependency org="commons-collections" name="commons-collections"
+        rev="${commons-collections.version}" conf="common->master"/>
     <dependency org="commons-cli" name="commons-cli"
         rev="${commons-cli.version}" conf="common->master"/>
+    <dependency org="commons-configuration" name="commons-configuration"
+        rev="${commons-configuration.version}" conf="common->master"/>
+    <dependency org="commons-lang" name="commons-lang"
+        rev="${commons-lang.version}" conf="common->master"/>
     <dependency org="commons-io" name="commons-io"
         rev="${commons-io.version}" conf="common->master"/>
     <dependency org="org.codehaus.jettison" name="jettison"
@@ -58,6 +70,10 @@
         rev="${jackson.version}" conf="common->master"/>
     <dependency org="org.codehaus.jackson" name="jackson-core-asl"
         rev="${jackson.version}" conf="common->master"/>
+    <dependency org="org.slf4j" name="slf4j-api"
+        rev="${slf4j-api.version}" conf="common->master"/>
+    <dependency org="org.apache.avro" name="avro"
+        rev="${avro.version}" conf="common->master"/>
 
     <dependency org="commons-codec" name="commons-codec"
         rev="${commons-codec.version}" conf="common->master"/>

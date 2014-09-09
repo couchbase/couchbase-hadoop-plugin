@@ -34,13 +34,14 @@ import net.spy.memcached.tapmessage.ResponseMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Tests seriaization of values when imported into Hadoop.
  */
-public class CouchbaseRecordReadSerializeTest extends TestCase {
+public class CouchbaseRecordReadSerializeTest {
 
   public static final Log LOG =
       LogFactory.getLog(CouchbaseRecordReadSerializeTest.class.getName());
@@ -54,9 +55,7 @@ public class CouchbaseRecordReadSerializeTest extends TestCase {
   private String dateText;
 
   @Before
-  @Override
   public void setUp() throws Exception {
-    super.setUp();
 
     tappedStuff = new HashMap<String, ResponseMessage>();
 
@@ -68,7 +67,7 @@ public class CouchbaseRecordReadSerializeTest extends TestCase {
       cb = new CouchbaseClient(Arrays.asList(uri), user, pass);
     } catch (IOException e) {
       LOG.error("Couldn't connect to server" + e.getMessage());
-      fail(e.toString());
+      Assert.fail(e.toString());
     }
     this.client = new TapClient(Arrays.asList(uri), user, pass);
 
@@ -113,7 +112,6 @@ public class CouchbaseRecordReadSerializeTest extends TestCase {
   }
 
   @After
-  @Override
   public void tearDown() {
     cb.shutdown();
     client.shutdown();
@@ -123,10 +121,10 @@ public class CouchbaseRecordReadSerializeTest extends TestCase {
   public void testDeserializer() {
     for (Map.Entry<String, ResponseMessage> entry : tappedStuff.entrySet()) {
       if (entry.getKey().matches(dateText)) {
-        assertEquals("Could not verify", dateText, CouchbaseRecordUtil
+        Assert.assertEquals("Could not verify", dateText, CouchbaseRecordUtil
             .deserialize(entry.getValue()).toString().replaceAll(" ", "_"));
       } else {
-        assertEquals("Could not verify ", entry.getKey(),
+        Assert.assertEquals("Could not verify ", entry.getKey(),
             (CouchbaseRecordUtil.deserialize(entry.getValue()).toString()));
       }
     }
