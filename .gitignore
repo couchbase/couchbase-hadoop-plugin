@@ -1,6 +1,8 @@
 *~
 .classpath
 .DS_Store
+.idea/tasks.xml
+.idea/workspace.xml
 .project
 build/
 DUMP*
