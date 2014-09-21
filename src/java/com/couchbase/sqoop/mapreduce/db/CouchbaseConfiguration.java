@@ -20,6 +20,7 @@ import com.cloudera.sqoop.mapreduce.db.DBConfiguration;
 import com.cloudera.sqoop.mapreduce.db.DBInputFormat.NullDBWritable;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.db.DBWritable;
 
@@ -63,7 +64,7 @@ public class CouchbaseConfiguration {
   }
 
   public String getPassword() {
-    return conf.get(DBConfiguration.PASSWORD_PROPERTY, "");
+      return DBConfiguration.getPassword((JobConf) conf);
   }
 
   public void setPassword(String password) {
