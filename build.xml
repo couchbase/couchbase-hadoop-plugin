@@ -294,6 +294,7 @@
         <exclude name="lib/ant-eclipse-1.0-jvm1.2.jar" />
         <exclude name="build.xml" />
         <exclude name="ivy.xml" />
+        <exclude name=".idea/**" />
       </fileset>
     </delete>
   </target>
