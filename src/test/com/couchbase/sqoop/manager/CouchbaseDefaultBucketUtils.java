@@ -21,7 +21,7 @@ import com.cloudera.sqoop.SqoopOptions;
 /**
  * Holds test configuration information.
  */
-public final class CouchbaseUtils {
+public final class CouchbaseDefaultBucketUtils {
   public static final String CONNECT_STRING =
       System.getProperty("sqoop.test.couchbase.connectstring",
       "http://localhost:8091/pools");
@@ -33,7 +33,7 @@ public final class CouchbaseUtils {
   public static final String COUCHBASE_CONN_MANAGER =
       "com.couchbase.sqoop.manager.CouchbaseManager";
 
-  private CouchbaseUtils() {
+  private CouchbaseDefaultBucketUtils() {
     // Empty
   }
 

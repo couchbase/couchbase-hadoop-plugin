@@ -20,18 +20,6 @@ import com.cloudera.sqoop.testutil.CommonArgs;
 import com.cloudera.sqoop.testutil.ImportJobTestCase;
 import com.cloudera.sqoop.util.FileListing;
 import com.couchbase.client.CouchbaseClient;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
@@ -40,12 +28,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 /**
  * Tests the import functionality of the plugin.
  */
-public class CouchbaseManagerTest extends ImportJobTestCase {
+public class CouchbaseAuthdBucketManagerTest extends ImportJobTestCase {
   public static final Log LOG = LogFactory.getLog(
-      CouchbaseManagerTest.class.getName());
+      CouchbaseAuthdBucketManagerTest.class.getName());
 
   private static final String TABLE_NAME = "DUMP";
   private static final int NUM_RECORDS = 5;
@@ -57,9 +52,9 @@ public class CouchbaseManagerTest extends ImportJobTestCase {
     super.setUp();
 
     try {
-      URI uri = new URI(CouchbaseUtils.CONNECT_STRING);
-      String user = CouchbaseUtils.COUCHBASE_USER_NAME;
-      String pass = CouchbaseUtils.COUCHBASE_USER_PASS;
+      URI uri = new URI(CouchbaseAuthdBucketUtils.CONNECT_STRING);
+      String user = CouchbaseAuthdBucketUtils.COUCHBASE_USER_NAME;
+      String pass = CouchbaseAuthdBucketUtils.COUCHBASE_USER_PASS;
       cb = new CouchbaseClient(Arrays.asList(uri), user, user, pass);
     } catch (URISyntaxException e) {
       LOG.error("Bad URL" + e.getMessage());
@@ -81,17 +76,17 @@ public class CouchbaseManagerTest extends ImportJobTestCase {
     CommonArgs.addHadoopFlags(args);
 
     args.add("--connection-manager");
-    args.add(CouchbaseUtils.COUCHBASE_CONN_MANAGER);
+    args.add(CouchbaseAuthdBucketUtils.COUCHBASE_CONN_MANAGER);
     args.add("--table");
     args.add(TABLE_NAME);
     args.add("--warehouse-dir");
     args.add(getWarehouseDir());
     args.add("--connect");
-    args.add(CouchbaseUtils.CONNECT_STRING);
+    args.add(CouchbaseAuthdBucketUtils.CONNECT_STRING);
     args.add("--username");
-    args.add(CouchbaseUtils.COUCHBASE_USER_NAME);
+    args.add(CouchbaseAuthdBucketUtils.COUCHBASE_USER_NAME);
     args.add("--password");
-    args.add(CouchbaseUtils.COUCHBASE_USER_PASS);
+    args.add(CouchbaseAuthdBucketUtils.COUCHBASE_USER_PASS);
     args.add("--num-mappers");
     args.add("2");
 
@@ -164,7 +159,7 @@ public class CouchbaseManagerTest extends ImportJobTestCase {
    *            expected line
    * @param receivedLine
    *            received line
-   * @throws IOException
+   * @throws java.io.IOException
    *             exception during lines comparison
    */
   private void compareRecords(HashMap<String, String> expectedMap,

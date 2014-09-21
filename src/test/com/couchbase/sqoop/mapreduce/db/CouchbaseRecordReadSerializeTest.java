@@ -18,7 +18,7 @@ package com.couchbase.sqoop.mapreduce.db;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.TapClient;
 import com.couchbase.sqoop.lib.CouchbaseRecordUtil;
-import com.couchbase.sqoop.manager.CouchbaseUtils;
+import com.couchbase.sqoop.manager.CouchbaseDefaultBucketUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,8 +26,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import net.spy.memcached.tapmessage.ResponseMessage;
 
@@ -59,9 +57,9 @@ public class CouchbaseRecordReadSerializeTest {
 
     tappedStuff = new HashMap<String, ResponseMessage>();
 
-    URI uri = new URI(CouchbaseUtils.CONNECT_STRING);
-    String user = CouchbaseUtils.COUCHBASE_USER_NAME;
-    String pass = CouchbaseUtils.COUCHBASE_USER_PASS;
+    URI uri = new URI(CouchbaseDefaultBucketUtils.CONNECT_STRING);
+    String user = CouchbaseDefaultBucketUtils.COUCHBASE_USER_NAME;
+    String pass = CouchbaseDefaultBucketUtils.COUCHBASE_USER_PASS;
 
     try {
       cb = new CouchbaseClient(Arrays.asList(uri), user, pass);

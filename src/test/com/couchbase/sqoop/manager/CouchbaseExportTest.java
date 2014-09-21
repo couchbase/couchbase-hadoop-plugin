@@ -53,22 +53,22 @@ public class CouchbaseExportTest extends TestExport {
 
   @Override
   protected String getConnectString() {
-    return CouchbaseUtils.CONNECT_STRING;
+    return CouchbaseDefaultBucketUtils.CONNECT_STRING;
   }
 
   @Before
   public void setUp() {
-    getConf().set("connection.manager", CouchbaseUtils.COUCHBASE_CONN_MANAGER);
+    getConf().set("connection.manager", CouchbaseDefaultBucketUtils.COUCHBASE_CONN_MANAGER);
     super.setUp();
 
-    SqoopOptions options = new SqoopOptions(CouchbaseUtils.CONNECT_STRING,
+    SqoopOptions options = new SqoopOptions(CouchbaseDefaultBucketUtils.CONNECT_STRING,
         getTableName());
-    options.setConnManagerClassName(CouchbaseUtils.COUCHBASE_CONN_MANAGER);
+    options.setConnManagerClassName(CouchbaseDefaultBucketUtils.COUCHBASE_CONN_MANAGER);
     this.manager = new CouchbaseManager(options);
 
-    String connStr = CouchbaseUtils.CONNECT_STRING;
-    String user = CouchbaseUtils.COUCHBASE_USER_NAME;
-    String pass = CouchbaseUtils.COUCHBASE_USER_PASS;
+    String connStr = CouchbaseDefaultBucketUtils.CONNECT_STRING;
+    String user = CouchbaseDefaultBucketUtils.COUCHBASE_USER_NAME;
+    String pass = CouchbaseDefaultBucketUtils.COUCHBASE_USER_PASS;
 
     try {
       cb = new CouchbaseClient(Arrays.asList(new URI(connStr)), user, user,
@@ -107,11 +107,11 @@ public class CouchbaseExportTest extends TestExport {
 
     // Add username and password args.
     moreArgs[i++] = "--username";
-    moreArgs[i++] = CouchbaseUtils.COUCHBASE_USER_NAME;
+    moreArgs[i++] = CouchbaseDefaultBucketUtils.COUCHBASE_USER_NAME;
     moreArgs[i++] = "--password";
-    moreArgs[i++] = CouchbaseUtils.COUCHBASE_USER_PASS;
+    moreArgs[i++] = CouchbaseDefaultBucketUtils.COUCHBASE_USER_PASS;
     moreArgs[i++] = "--connection-manager";
-    moreArgs[i++] = CouchbaseUtils.COUCHBASE_CONN_MANAGER;
+    moreArgs[i++] = CouchbaseDefaultBucketUtils.COUCHBASE_CONN_MANAGER;
 
     return super.getCodeGenArgv(moreArgs);
   }
@@ -121,9 +121,9 @@ public class CouchbaseExportTest extends TestExport {
     int rowsPerStatement, int statementsPerTx, String... additionalArgv) {
 
     String [] subArgv = newStrArray(additionalArgv,
-        "--username", CouchbaseUtils.COUCHBASE_USER_NAME,
-        "--password", CouchbaseUtils.COUCHBASE_USER_PASS,
-        "--connection-manager", CouchbaseUtils.COUCHBASE_CONN_MANAGER);
+        "--username", CouchbaseDefaultBucketUtils.COUCHBASE_USER_NAME,
+        "--password", CouchbaseDefaultBucketUtils.COUCHBASE_USER_PASS,
+        "--connection-manager", CouchbaseDefaultBucketUtils.COUCHBASE_CONN_MANAGER);
     return super.getArgv(includeHadoopFlags, rowsPerStatement,
         statementsPerTx, subArgv);
   }
