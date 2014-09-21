@@ -1,5 +1,5 @@
 <!--
-  Copyright 2011-2012 Couchbase, Inc.
+  Copyright 2011-2014 Couchbase, Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -189,7 +189,9 @@
         includes="**/*.java"
         destdir="${build.classes}"
         debug="${javac.debug}"
-        deprecation="${javac.deprecation}">
+        deprecation="${javac.deprecation}"
+        target="1.6"
+        source="1.6">
       <classpath refid="${name}.common.classpath" />
     </javac>
   </target>
@@ -203,7 +205,9 @@
         srcdir="${test.dir}"
         includes="**/*.java"
         destdir="${build.test.classes}"
-        debug="${javac.debug}">
+        debug="${javac.debug}"
+        target="1.6"
+        source="1.6">
       <classpath>
         <path refid="test.classpath"/>
       </classpath>
