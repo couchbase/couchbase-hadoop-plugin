@@ -5,6 +5,7 @@
 .idea/workspace.xml
 .project
 build/
+couchbase-hadoop-plugin-*.zip
 DUMP*
 EXPORT_TABLE*
 lib/ivy*
