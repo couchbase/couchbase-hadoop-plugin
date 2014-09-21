@@ -155,8 +155,8 @@ public class CouchbaseAuthdBucketManagerTest extends ImportJobTestCase {
    * Compare two lines. Normalize the dates we receive based on the expected
    * time zone.
    *
-   * @param expectedLine
-   *            expected line
+   * @param expectedMap
+   *            expected map
    * @param receivedLine
    *            received line
    * @throws java.io.IOException
