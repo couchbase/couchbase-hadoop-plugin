@@ -235,10 +235,6 @@
         todir="${dist.dir}" />
     <copy file="${build.ivy.lib.dir}/${name}/common/netty-${netty.version}.jar"
         todir="${dist.dir}" />
-    <copy file="${build.ivy.lib.dir}/${name}/common/httpcore-${httpcore.version}.jar"
-            todir="${dist.dir}" />
-    <copy file="${build.ivy.lib.dir}/${name}/common/httpcore-nio-${httpcore-nio.version}.jar"
-            todir="${dist.dir}" />
     <copy file="${etc.dir}/install.sh" todir="${dist.dir}" />
     <copy file="${build.dir}/${name}-${version}.jar" todir="${dist.dir}" />
     <zip destfile="${name}-${version}.zip" basedir="${dist.dir}" />
