@@ -18,7 +18,6 @@ import com.cloudera.sqoop.Sqoop;
 import com.cloudera.sqoop.SqoopOptions;
 import com.cloudera.sqoop.tool.ExportTool;
 import com.cloudera.sqoop.tool.SqoopTool;
-import com.couchbase.sqoop.manager.CouchbaseUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -26,6 +25,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import com.couchbase.sqoop.manager.CouchbaseUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
