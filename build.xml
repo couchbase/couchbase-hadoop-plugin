@@ -20,7 +20,7 @@
 
   <!-- Directory variables -->
   <property name="name" value="couchbase-hadoop-plugin"/>
-  <property name="version" value="1.1-dp5"/>
+  <property name="version" value="1.2-beta"/>
   <property name="lib.dir" value="${basedir}/lib" />
   <property name="ivy.dir" location="${basedir}/ivy" />
   <property name="build.dir" value="${basedir}/build" />
