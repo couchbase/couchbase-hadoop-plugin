@@ -1,1 +1,1 @@
-com.couchbase.sqoop.manager.CouchbaseFactory=lib/couchbase-hadoop-plugin-1.2-beta.jar
+com.couchbase.sqoop.manager.CouchbaseFactory=lib/couchbase-hadoop-plugin-1.2.0.jar
